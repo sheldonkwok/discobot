@@ -1,0 +1,30 @@
+{
+  "name": "discobot",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "shx rm -rf lib && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sheldonkwok/discobot.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sheldonkwok/discobot/issues"
+  },
+  "homepage": "https://github.com/sheldonkwok/discobot#readme",
+  "dependencies": {
+    "typescript": "^2.9.2"
+  },
+  "prettier": {
+    "printWidth": 110,
+    "trailingComma": "all",
+    "singleQuote": true
+  },
+  "devDependencies": {
+    "shx": "^0.3.2"
+  }
+}
