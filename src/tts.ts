@@ -1,5 +1,6 @@
 import * as http from 'http';
 import * as fs from 'mz/fs';
+import * as cp from 'mz/child_process';
 import * as crypto from 'crypto';
 import * as path from 'path';
 import * as qs from 'querystring';
@@ -8,6 +9,7 @@ const config = require('../config.json');
 
 export const HOST = 'translate.google.com';
 const MP3_DIR = config.mp3CacheDir;
+const MY_MAN_MP3 = path.resolve(__dirname, '../assets/myman.mp3');
 
 const BASE_QS = {
   ie: 'UTF-8',
@@ -49,6 +51,10 @@ export async function create(username: string, filename: string): Promise<void> 
   });
 }
 
+async function appendMyMan(filePath: string): Promise<void> {
+  await cp.execFile('ffmpeg', ['-y', '-i', `concat:${filePath}|${MY_MAN_MP3}`, '-f', 'mp3', filePath]);
+}
+
 export async function get(id: string, username: string): Promise<string> {
   const userHash = hashSHA1(username);
   const filename = `${id}-${userHash}.mp3`;
@@ -58,7 +64,8 @@ export async function get(id: string, username: string): Promise<string> {
 
   const tmpPath = `${filePath}.tmp`;
   await create(username, tmpPath);
-
+  await appendMyMan(tmpPath);
   await fs.rename(tmpPath, filePath);
+
   return filePath;
 }
