@@ -1,4 +1,3 @@
-import * as fs from 'mz/fs';
 import * as Discord from 'discord.js';
 
 import * as tts from './tts';
@@ -28,10 +27,7 @@ client.on('ready', async () => {
     if (member.voiceChannelID === null) return;
 
     const username = member.nickname || member.user.username;
-    const file = `/tmp/${username}.mp3`;
-
-    if (!(await fs.exists(file))) await tts.create(username, file);
-
+    const file = await tts.get(username);
     const dispatcher = voiceConn.playFile(file);
     dispatcher.on('end', () => dispatcher.end());
   });

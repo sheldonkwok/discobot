@@ -1,8 +1,12 @@
 import * as http from 'http';
-import * as fs from 'fs';
+import * as fs from 'mz/fs';
+import * as path from 'path';
 import * as qs from 'querystring';
 
+const config = require('../config.json');
+
 export const HOST = 'translate.google.com';
+const MP3_DIR = config.mp3CacheDir;
 
 const BASE_QS = {
   ie: 'UTF-8',
@@ -29,11 +33,23 @@ export async function create(username: string, filename: string): Promise<void> 
       const code = response.statusCode;
       if (code !== 200) return rej(new Error(`Unable to create tts code: ${code}`));
 
-      const fileStream = fs.createWriteStream(filename);
       response
-        .pipe(fileStream)
+        .pipe(fs.createWriteStream(filename))
         .on('close', () => resolve())
         .on('error', () => rej(new Error(`Failed to create tts of ${username} to ${filename}`)));
     });
   });
+}
+
+export async function get(username: string): Promise<string> {
+  const filename = `${username}.mp3`;
+  const filePath = path.join(MP3_DIR, filename);
+
+  if (await fs.exists(filePath)) return filePath;
+
+  const tmpPath = `${filePath}.tmp`;
+  await create(username, tmpPath);
+
+  await fs.rename(tmpPath, filePath);
+  return filePath;
 }
