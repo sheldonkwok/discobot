@@ -1,5 +1,6 @@
 import * as http from 'http';
 import * as fs from 'mz/fs';
+import * as crypto from 'crypto';
 import * as path from 'path';
 import * as qs from 'querystring';
 
@@ -16,6 +17,13 @@ const BASE_QS = {
   client: 'tw-ob',
   tl: 'En-gb',
 };
+
+function hashSHA1(str: string): string {
+  return crypto
+    .createHash('sha1')
+    .update(str)
+    .digest('hex');
+}
 
 export async function create(username: string, filename: string): Promise<void> {
   const qStr = qs.stringify({ ...BASE_QS, q: username });
@@ -41,8 +49,9 @@ export async function create(username: string, filename: string): Promise<void> 
   });
 }
 
-export async function get(username: string): Promise<string> {
-  const filename = `${username}.mp3`;
+export async function get(id: string, username: string): Promise<string> {
+  const userHash = hashSHA1(username);
+  const filename = `${id}-${userHash}.mp3`;
   const filePath = path.join(MP3_DIR, filename);
 
   if (await fs.exists(filePath)) return filePath;

@@ -27,7 +27,7 @@ client.on('ready', async () => {
     if (member.voiceChannelID === null) return;
 
     const username = member.nickname || member.user.username;
-    const file = await tts.get(username);
+    const file = await tts.get(member.id, username);
     const dispatcher = voiceConn.playFile(file);
     dispatcher.on('end', () => dispatcher.end());
   });
