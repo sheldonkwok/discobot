@@ -1,5 +1,8 @@
 {
   "discord": {
-    "token": "token"
-  }
+    "token": "token",
+    "voiceChannelID": "id"
+  },
+
+  "mp3CacheDir": "/tmp/discoCache"
 }
