@@ -25,6 +25,7 @@
     "singleQuote": true
   },
   "devDependencies": {
+    "@types/node": "^10.5.2",
     "shx": "^0.3.2"
   }
 }
