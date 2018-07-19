@@ -20,8 +20,7 @@
   "dependencies": {
     "discord.js": "^11.3.2",
     "mz": "^2.7.0",
-    "node-opus": "^0.3.0",
-    "typescript": "^2.9.2"
+    "node-opus": "^0.3.0"
   },
   "prettier": {
     "printWidth": 110,
@@ -30,6 +29,7 @@
   },
   "devDependencies": {
     "@types/mz": "0.0.32",
-    "@types/node": "^10.5.2"
+    "@types/node": "^10.5.2",
+    "typescript": "^2.9.2"
   }
 }

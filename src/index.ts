@@ -36,8 +36,10 @@ client.on('ready', async () => {
 });
 
 client.on('error', exit);
+
 client.login(config.discord.token);
 
 process.on('SIGINT', () => {
   client.destroy();
+  process.exit(2);
 });
