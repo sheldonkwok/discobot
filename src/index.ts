@@ -23,11 +23,12 @@ client.on('ready', async () => {
 
   const voiceConn = await channel.join();
 
-  client.on('voiceStateUpdate', async (_, member) => {
-    if (member.voiceChannelID === null) return;
+  client.on('voiceStateUpdate', async (oldMember, newMember) => {
+    if (oldMember.voiceChannelID !== null || newMember.voiceChannelID === null) return;
 
-    const username = member.nickname || member.user.username;
-    const file = await tts.get(member.id, username);
+    const username = newMember.nickname || newMember.user.username;
+    const file = await tts.get(newMember.id, username);
+
     const dispatcher = voiceConn.playFile(file);
     dispatcher.on('end', () => dispatcher.end());
   });
