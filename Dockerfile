@@ -10,7 +10,7 @@ RUN npm install
 
 COPY src tsconfig.json ./
 RUN npm run build && \
-    npm prune --production
+    npm prune --production 
 
 # run stage
 FROM node:8.11-jessie
@@ -25,7 +25,7 @@ RUN cd /tmp && \
 WORKDIR /opt/app
 
 COPY --from=build /opt/app/node_modules node_modules
-COPY --from=build /opt/app/lib .
+COPY --from=build /opt/app/lib lib
 COPY . .
 
 ENTRYPOINT ["bin/run"]
