@@ -15,13 +15,7 @@ RUN npm run build && \
 # run stage
 FROM node:8.11-alpine
 
-RUN apk add --update wget ca-certificates && \
-    cd /tmp && \
-    wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz && \
-    tar -Jxf ffmpeg-release-64bit-static.tar.xz && \
-    mv ffmpeg-4.0.1-64bit-static/ffmpeg /usr/local/bin && \
-    rm -rf /tmp/* && \
-    apk del wget
+RUN apk add --update ffmpeg ca-certificates
 
 USER node
 WORKDIR /opt/app
