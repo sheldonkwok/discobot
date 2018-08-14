@@ -1,10 +1,5 @@
 sudo: required
-language: node_js
-node_js:
-  - 'node'
-  - '10'
-
 services:
   - docker
 
-script: docker build -t test .
+script: docker build -t sheldonkwok/discobot .
