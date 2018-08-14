@@ -1,7 +1,10 @@
+sudo: required
 language: node_js
 node_js:
-  - 'nodejs'
+  - 'node'
   - '10'
 
-before_script: npm install
-script: npm run build
+services:
+  - docker
+
+script: docker build -t test .
