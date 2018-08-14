@@ -1,5 +1,5 @@
 sudo: required
-langauge: bash
+language: bash
 services:
   - docker
 
