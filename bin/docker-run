@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e 
+
+docker build -t discobot .
+docker rm -f discobot
+exec docker run -d --name discobot -v $(pwd)/config.json:/opt/app/config.json --restart always discobot
