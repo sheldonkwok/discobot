@@ -18,9 +18,9 @@
   },
   "homepage": "https://github.com/sheldonkwok/discobot#readme",
   "dependencies": {
-    "discord.js": "^11.3.2",
+    "discord.js": "~11.4.2",
     "mz": "^2.7.0",
-    "node-opus": "^0.3.0"
+    "node-opus": "^0.3.1"
   },
   "prettier": {
     "printWidth": 110,
@@ -30,6 +30,6 @@
   "devDependencies": {
     "@types/mz": "0.0.32",
     "@types/node": "^10.5.2",
-    "typescript": "^2.9.2"
+    "typescript": "~3.3.0"
   }
 }
