@@ -1,5 +1,6 @@
 import * as Discord from 'discord.js';
 
+import * as gc from './gc';
 import * as tts from './tts';
 
 const config = require('../config.json');
@@ -37,6 +38,12 @@ client.on('ready', async () => {
   if (!channel) throw new Error('Unable to join voice channel');
 
   let voiceConn = await channel.join();
+
+  client.on('message', async msg => {
+    const { content } = msg;
+
+    if (content === '!gc') await gc.run(msg);
+  });
 
   client.on('voiceStateUpdate', async (oldMember, newMember) => {
     await handleVoiceState(voiceConn, oldMember, newMember);
