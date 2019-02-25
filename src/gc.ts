@@ -14,7 +14,7 @@ export async function run(msg: Discord.Message): Promise<void> {
 
     membersToDelete.add(mem.id);
     await mem.kick();
-  });
+  }, { concurrency: 5 });
 
   const currMsgs = await channel.fetchMessages();
   const msgsToDelete = currMsgs
