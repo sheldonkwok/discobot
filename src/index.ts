@@ -9,9 +9,10 @@ const client = new Discord.Client();
 const VOICE_CHANNEL_ID: string = config.discord.voiceChannelID;
 const VOICE_RECONNECT_DELAY = 2 * 60 * 60 * 1000;
 
-function exit() {
+function exit(err: Error) {
   console.warn('Unintentional exit');
-  console.warn(arguments);
+  console.error(err);
+
   process.exit(1);
 }
 
@@ -60,6 +61,8 @@ client.on('ready', async () => {
 client.on('error', exit);
 
 client.login(config.discord.token);
+
+process.on('unhandledRejection', exit);
 
 process.on('SIGINT', () => {
   client.destroy();

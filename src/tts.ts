@@ -51,8 +51,11 @@ export async function create(username: string, filename: string): Promise<void> 
   });
 }
 
-async function appendMyMan(filePath: string): Promise<void> {
-  await cp.execFile('ffmpeg', ['-y', '-i', `concat:${filePath}|${MY_MAN_MP3}`, '-f', 'mp3', filePath]);
+async function appendMyMan(filePath: string): Promise<string> {
+  const newFile = `${filePath}.myman`;
+  await cp.execFile('ffmpeg', ['-y', '-i', `concat:${filePath}|${MY_MAN_MP3}`, '-f', 'mp3', newFile]);
+
+  return newFile;
 }
 
 export async function get(id: string, username: string): Promise<string> {
@@ -64,8 +67,13 @@ export async function get(id: string, username: string): Promise<string> {
 
   const tmpPath = `${filePath}.tmp`;
   await create(username, tmpPath);
-  await appendMyMan(tmpPath);
-  await fs.rename(tmpPath, filePath);
+
+  try {
+    const myManFile = await appendMyMan(tmpPath);
+    await fs.rename(myManFile, filePath);
+  } finally {
+    await fs.unlink(tmpPath);
+  }
 
   return filePath;
 }
