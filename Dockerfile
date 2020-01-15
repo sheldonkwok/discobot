@@ -1,11 +1,11 @@
 # build stage
-FROM node:8.11-alpine as build
+FROM node:10.17 as build
 
-RUN apk add --update make gcc g++ python
+RUN apt-get update && apt-get install -y libopus-dev
 
 WORKDIR /opt/app
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 
 COPY src tsconfig.json ./
 
@@ -13,9 +13,9 @@ RUN npm run build && \
     npm prune --production
 
 # run stage
-FROM node:8.11-alpine
+FROM node:10.17
 
-RUN apk add --update ffmpeg ca-certificates
+RUN apt-get update && apt-get install libopus-dev -y ffmpeg
 
 USER node
 WORKDIR /opt/app
