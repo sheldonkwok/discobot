@@ -9,13 +9,6 @@ const client = new Discord.Client();
 const VOICE_CHANNEL_ID: string = config.discord.voiceChannelID;
 const VOICE_RECONNECT_DELAY = 2 * 60 * 60 * 1000;
 
-function exit(err: Error) {
-  console.warn('Unintentional exit');
-  console.error(err);
-
-  process.exit(1);
-}
-
 function matchVoiceChannel(c: Discord.Channel): boolean {
   return c.type === 'voice' && c.id === VOICE_CHANNEL_ID;
 }
@@ -30,15 +23,15 @@ async function handleVoiceState(
   const username = newMember.nickname || newMember.user.username;
   const file = await tts.get(newMember.id, username);
 
-  const dispatcher = voiceConn.playFile(file);
-  dispatcher.on('end', () => dispatcher.end());
+  voiceConn.playConvertedStream(file);
 }
 
+let voiceConn: Discord.VoiceConnection;
 client.on('ready', async () => {
   const channel = client.channels.find(matchVoiceChannel) as Discord.VoiceChannel;
   if (!channel) throw new Error('Unable to join voice channel');
 
-  let voiceConn = await channel.join();
+  voiceConn = await channel.join();
 
   client.on('message', async msg => {
     const { content } = msg;
@@ -58,13 +51,22 @@ client.on('ready', async () => {
   console.log('ready');
 });
 
-client.on('error', exit);
+function errored() {
+  console.warn('Unintentional exit');
+  console.warn(arguments);
+  process.exit(1);
+}
+
+client.on('error', errored);
 
 client.login(config.discord.token);
 
-process.on('unhandledRejection', exit);
-
-process.on('SIGINT', () => {
+function exit() {
+  if (voiceConn) voiceConn.disconnect();
   client.destroy();
+
   process.exit(2);
-});
+}
+
+process.on('SIGINT', () => exit());
+process.on('SIGTERM', () => exit());

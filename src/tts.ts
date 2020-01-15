@@ -8,7 +8,7 @@ import * as qs from 'querystring';
 const config = require('../config.json');
 
 export const HOST = 'translate.google.com';
-const MP3_DIR = config.mp3CacheDir;
+const AUDIO_DIR = config.mp3CacheDir;
 const MY_MAN_MP3 = path.resolve(__dirname, '../assets/myman.mp3');
 
 const BASE_QS = {
@@ -52,28 +52,39 @@ export async function create(username: string, filename: string): Promise<void> 
 }
 
 async function appendMyMan(filePath: string): Promise<string> {
-  const newFile = `${filePath}.myman`;
-  await cp.execFile('ffmpeg', ['-y', '-i', `concat:${filePath}|${MY_MAN_MP3}`, '-f', 'mp3', newFile]);
+  const newPath = `${filePath}.myman`;
+  await cp.execFile('ffmpeg', ['-y', '-i', `concat:${filePath}|${MY_MAN_MP3}`, '-f', 'mp3', newPath]);
 
-  return newFile;
+  return newPath;
 }
 
-export async function get(id: string, username: string): Promise<string> {
+async function convertPCM(filePath: string): Promise<string> {
+  const pcmPath = `${filePath}.pcm`;
+  await cp.execFile('ffmpeg', ['-y', '-i', filePath, '-f', 's16le', '-ar', '48000', '-ac', '2', pcmPath]);
+
+  return pcmPath;
+}
+
+export async function getFile(id: string, username: string): Promise<string> {
   const userHash = hashSHA1(username);
-  const filename = `${id}-${userHash}.mp3`;
-  const filePath = path.join(MP3_DIR, filename);
+  const filename = `${id}-${userHash}`;
+  const filePath = path.join(AUDIO_DIR, filename);
 
   if (await fs.exists(filePath)) return filePath;
 
-  const tmpPath = `${filePath}.tmp`;
-  await create(username, tmpPath);
+  const tmpFile = `${filePath}.tmp`;
+  await create(username, tmpFile);
+  const appended = await appendMyMan(tmpFile);
+  const pcm = await convertPCM(appended);
 
-  try {
-    const myManFile = await appendMyMan(tmpPath);
-    await fs.rename(myManFile, filePath);
-  } finally {
-    await fs.unlink(tmpPath);
-  }
+  await fs.rename(pcm, filePath);
+  await Promise.all([fs.unlink(tmpFile), fs.unlink(appended)]);
 
   return filePath;
+}
+
+export async function get(id: string, username: string): Promise<fs.ReadStream> {
+  const filename = await getFile(id, username);
+
+  return fs.createReadStream(filename);
 }
