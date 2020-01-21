@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+docker tag discobot sheldonkwok/discobot
+docker push sheldonkwok/discobot

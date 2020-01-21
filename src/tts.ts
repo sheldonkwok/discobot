@@ -1,3 +1,4 @@
+import * as bluebird from 'bluebird';
 import * as http from 'http';
 import * as fs from 'mz/fs';
 import * as cp from 'mz/child_process';
@@ -80,6 +81,7 @@ export async function getFile(id: string, username: string): Promise<string> {
   await fs.rename(pcm, filePath);
   await Promise.all([fs.unlink(tmpFile), fs.unlink(appended)]);
 
+  await bluebird.delay(2000); // test file creation async issue theory
   return filePath;
 }
 
