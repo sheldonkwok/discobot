@@ -7,7 +7,7 @@ const config = require('../config.json');
 const client = new Discord.Client();
 
 const VOICE_CHANNEL_ID: string = config.discord.voiceChannelID;
-const VOICE_RECONNECT_DELAY = 2 * 60 * 60 * 1000;
+const VOICE_RECONNECT_DELAY = 12 * 60 * 60 * 1000;
 
 function matchVoiceChannel(c: Discord.Channel): boolean {
   return c.type === 'voice' && c.id === VOICE_CHANNEL_ID;
@@ -18,7 +18,8 @@ async function handleVoiceState(
   oldMember: Discord.GuildMember,
   newMember: Discord.GuildMember,
 ): Promise<void> {
-  if (oldMember.voiceChannelID !== null || newMember.voiceChannelID === null) return;
+  const oldVoiceID = oldMember.voiceChannelID;
+  if (oldVoiceID || newMember.voiceChannelID === null) return;
 
   const username = newMember.nickname || newMember.user.username;
   const file = await tts.get(newMember.id, username);
