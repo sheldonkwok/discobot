@@ -2,3 +2,4 @@ node_modules
 lib
 *.mp3
 config.json
+*.swp
