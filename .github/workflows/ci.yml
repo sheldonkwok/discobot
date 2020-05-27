@@ -1,13 +1,22 @@
-name: CI
+name: Docker Image
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+      - uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t sheldonkwok/discobot .
+      - name: Dockerhub login
+        run: echo $DOCKERHUB_PASSWORD | docker login --username sheldonkwok --password-stdin
+        env:
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Push Docker image
+        run: docker push sheldonkwok/discobot
