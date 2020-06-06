@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js';
 
-const ROLL_MAX_REGEX = /!roll\s(?<max>\d+)/;
+const ROLL_MAX_REGEX = /!roll\s(?<max>-?\d+)/;
 const DEFAULT_MAX = 100;
 
 export async function run(msg: Discord.Message): Promise<void> {
