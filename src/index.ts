@@ -3,6 +3,7 @@ import * as Discord from 'discord.js';
 import * as gc from './gc';
 import * as tts from './tts';
 import * as sim from './sim';
+import * as roll from './roll';
 
 const config = require('../config.json');
 const client = new Discord.Client();
@@ -40,6 +41,7 @@ client.on('ready', async () => {
 
     if (content === '!gc') await gc.run(msg);
     if (content.startsWith('!sim')) await sim.run(msg);
+    if (content.startsWith('!roll')) await roll.run(msg);
   });
 
   client.on('voiceStateUpdate', async (oldMember, newMember) => {
