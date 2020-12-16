@@ -1,6 +1,6 @@
 {
   "name": "discobot",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/sheldonkwok/discobot#readme",
   "dependencies": {
+    "@discordjs/opus": "~0.3.3",
     "bluebird": "~3.7.2",
-    "discord.js": "~11.5.1",
+    "discord.js": "~12.5.1",
     "mz": "^2.7.0",
-    "node-opus": "^0.3.3",
     "p-map": "^2.0.0"
   },
   "prettier": {
