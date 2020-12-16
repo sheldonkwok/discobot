@@ -58,12 +58,12 @@ async function appendMyMan(filePath: string): Promise<string> {
   return newPath;
 }
 
-async function convertPCM(filePath: string): Promise<string> {
-  const pcmPath = `${filePath}.pcm`;
-  await cp.execFile('ffmpeg', ['-y', '-i', filePath, '-f', 's16le', '-ar', '48000', '-ac', '2', pcmPath]);
-
-  return pcmPath;
-}
+// async function convertPCM(filePath: string): Promise<string> {
+//   const pcmPath = `${filePath}.pcm`;
+//   await cp.execFile('ffmpeg', ['-y', '-i', filePath, '-f', 's16le', '-ar', '48000', '-ac', '2', pcmPath]);
+//
+//   return pcmPath;
+// }
 
 export async function getFile(id: string, username: string): Promise<string> {
   const userHash = hashSHA1(username);
@@ -75,10 +75,9 @@ export async function getFile(id: string, username: string): Promise<string> {
   const tmpFile = `${filePath}.tmp`;
   await create(username, tmpFile);
   const appended = await appendMyMan(tmpFile);
-  const pcm = await convertPCM(appended);
 
-  await fs.rename(pcm, filePath);
-  await Promise.all([fs.unlink(tmpFile), fs.unlink(appended)]);
+  await fs.rename(appended, filePath);
+  await fs.unlink(tmpFile);
 
   return filePath;
 }

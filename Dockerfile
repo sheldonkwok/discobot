@@ -1,5 +1,5 @@
 # build stage
-FROM node:10.17 as build
+FROM node:14 as build
 
 RUN apt-get update && apt-get install -y libopus-dev
 
@@ -13,7 +13,7 @@ RUN npm run build && \
     npm prune --production
 
 # run stage
-FROM node:10.17
+FROM node:14
 
 RUN apt-get update && apt-get install libopus-dev -y ffmpeg
 
