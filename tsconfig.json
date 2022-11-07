@@ -1,18 +1,13 @@
 {
+  "inclue": ["src"],
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "outDir": "./lib",
+    "lib": ["es2021"],
+    "target": "es2021",
+    "module": "CommonJS",
+    "outDir": "./dist",
     "strict": true,
-
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-
-    "moduleResolution": "node",
-
-    "inlineSourceMap": true,
-    "inlineSources": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   }
 }

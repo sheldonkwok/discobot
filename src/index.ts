@@ -1,42 +1,75 @@
 import * as Discord from 'discord.js';
-import * as bluebird from 'bluebird';
+import * as voice from '@discordjs/voice';
+import * as timers from 'timers/promises';
 
-import * as tts from './tts';
-import * as sim from './sim';
-import * as roll from './roll';
+import * as tts from './tts.js';
+import * as sim from './sim.js';
+import * as roll from './roll.js';
 
-const config = require('../config.json');
-const client = new Discord.Client();
+import config from '../config.json';
 
-const VOICE_CHANNEL_ID: string = config.discord.voiceChannelID;
+const client = new Discord.Client({
+  intents: [
+    Discord.GatewayIntentBits.Guilds,
+    Discord.GatewayIntentBits.GuildMessages,
+    Discord.GatewayIntentBits.GuildVoiceStates,
+  ],
+});
+
 const VOICE_RECONNECT_DELAY = 12 * 60 * 60 * 1000;
 const PLAY_DELAY = 500; // Don't want to play without the person being connected!
 
-let voiceConn: Discord.VoiceConnection;
+const player = voice.createAudioPlayer();
+let voiceConn: voice.VoiceConnection;
 
-function isVoiceChannel(channel: Discord.Channel): channel is Discord.VoiceChannel {
-  return channel.type === 'voice';
+function getFirstVoiceChannel(): Discord.VoiceBasedChannel {
+  for (const channel of client.channels.cache.values()) {
+    if (channel.type !== Discord.ChannelType.GuildVoice) continue;
+    return channel;
+  }
+
+  throw new Error('No voice channels found');
+}
+
+function joinVoice(channel: Discord.VoiceBasedChannel) {
+  const channelOpts = {
+    channelId: channel.id,
+    guildId: channel.guild.id,
+    adapterCreator: channel.guild.voiceAdapterCreator,
+  };
+
+  voiceConn = voice.joinVoiceChannel(channelOpts);
+  voiceConn.subscribe(player);
+
+  setInterval(async () => {
+    voiceConn.disconnect();
+
+    voiceConn = voice.joinVoiceChannel(channelOpts);
+    voiceConn.subscribe(player);
+  }, VOICE_RECONNECT_DELAY);
 }
 
 async function handleVoiceState(oldState: Discord.VoiceState, newState: Discord.VoiceState): Promise<void> {
-  const joined = oldState.channelID === null && typeof newState.channelID === 'string';
+  if (newState.member?.user.bot) return;
+
+  const joined = oldState.channelId === null && typeof newState.channelId === 'string';
   if (!joined || newState.member === null) return;
 
   const member = newState.member;
   const username = member.nickname || member.user.username;
 
-  const [file] = await Promise.all([tts.get(member.id, username), bluebird.delay(PLAY_DELAY)]);
+  const [file] = await Promise.all([tts.get(member.id, username), timers.setTimeout(PLAY_DELAY)]);
 
-  voiceConn.play(file);
+  const resource = voice.createAudioResource(file, { inputType: voice.StreamType.Arbitrary });
+  player.play(resource);
+  await voice.entersState(player, voice.AudioPlayerStatus.Playing, 10000);
 }
 
 client.on('ready', async () => {
-  const channel = await client.channels.fetch(VOICE_CHANNEL_ID);
-  if (!channel || !isVoiceChannel(channel)) throw new Error('Unable to join voice channel');
+  const channel = getFirstVoiceChannel();
+  joinVoice(channel);
 
-  voiceConn = await channel.join();
-
-  client.on('message', async msg => {
+  client.on('message', async (msg) => {
     const { content } = msg;
 
     if (content.startsWith('!sim')) await sim.run(msg);
@@ -45,13 +78,10 @@ client.on('ready', async () => {
 
   client.on('voiceStateUpdate', handleVoiceState);
 
-  setInterval(async () => {
-    voiceConn.disconnect();
-    voiceConn = await channel.join();
-  }, VOICE_RECONNECT_DELAY);
-
   console.log('ready');
 });
+
+client.login(config.discord.token);
 
 function errored() {
   console.warn('Unintentional exit');
@@ -60,8 +90,6 @@ function errored() {
 }
 
 client.on('error', errored);
-
-client.login(config.discord.token);
 
 function exit() {
   if (voiceConn) voiceConn.disconnect();
