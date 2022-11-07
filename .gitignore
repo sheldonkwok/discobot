@@ -3,3 +3,4 @@ lib
 *.mp3
 config.json
 *.swp
+dist
