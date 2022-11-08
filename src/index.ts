@@ -6,8 +6,6 @@ import * as tts from './tts.js';
 import * as sim from './sim.js';
 import * as roll from './roll.js';
 
-import config from '../config.json';
-
 const client = new Discord.Client({
   intents: [
     Discord.GatewayIntentBits.Guilds,
@@ -81,7 +79,10 @@ client.on('ready', async () => {
   console.log('ready');
 });
 
-client.login(config.discord.token);
+const token = process.env.DISCOBOT_TOKEN;
+if (!token) throw new Error('Specify DISOBOT_TOKEN env var');
+
+client.login(token);
 
 function errored() {
   console.warn('Unintentional exit');
