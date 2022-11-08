@@ -7,8 +7,8 @@ WORKDIR /opt/app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-COPY src src 
 COPY tsconfig.json ./
+COPY src src 
 
 
 RUN npm run build && \
@@ -17,7 +17,7 @@ RUN npm run build && \
 # run stage
 FROM node:18
 
-RUN apt-get update && apt-get install libopus-dev -y ffmpeg espeak
+RUN apt-get update && apt-get install -y libopus-dev ffmpeg espeak
 
 USER node
 WORKDIR /opt/app
