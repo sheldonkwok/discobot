@@ -2,11 +2,11 @@
   "name": "discobot",
   "version": "0.2.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/app.js",
   "scripts": {
     "build": "rm -rf lib && tsc",
     "watch": "tsc -w",
-    "start": "npm run build && node dist/index.js"
+    "start": "npm run build && node dist/app.js"
   },
   "repository": {
     "type": "git",

@@ -2,25 +2,22 @@ import * as Discord from 'discord.js';
 import * as voice from '@discordjs/voice';
 import * as timers from 'timers/promises';
 
-import * as tts from './tts.js';
-import * as sim from './sim.js';
-import * as roll from './roll.js';
-
-const client = new Discord.Client({
-  intents: [
-    Discord.GatewayIntentBits.Guilds,
-    Discord.GatewayIntentBits.GuildMessages,
-    Discord.GatewayIntentBits.GuildVoiceStates,
-  ],
-});
+import * as tts from './tts';
 
 const VOICE_RECONNECT_DELAY = 12 * 60 * 60 * 1000;
 const PLAY_DELAY = 500; // Don't want to play without the person being connected!
 
 const player = voice.createAudioPlayer();
-let voiceConn: voice.VoiceConnection;
+export let voiceConn: voice.VoiceConnection | undefined;
 
-function getFirstVoiceChannel(): Discord.VoiceBasedChannel {
+export function setup(client: Discord.Client): void {
+  const channel = getFirstVoiceChannel(client);
+  joinVoice(channel);
+
+  client.on('voiceStateUpdate', handleVoiceState);
+}
+
+function getFirstVoiceChannel(client: Discord.Client): Discord.VoiceBasedChannel {
   for (const channel of client.channels.cache.values()) {
     if (channel.type !== Discord.ChannelType.GuildVoice) continue;
     return channel;
@@ -40,7 +37,7 @@ function joinVoice(channel: Discord.VoiceBasedChannel) {
   voiceConn.subscribe(player);
 
   setInterval(async () => {
-    voiceConn.disconnect();
+    voiceConn?.disconnect();
 
     voiceConn = voice.joinVoiceChannel(channelOpts);
     voiceConn.subscribe(player);
@@ -62,42 +59,3 @@ async function handleVoiceState(oldState: Discord.VoiceState, newState: Discord.
   player.play(resource);
   await voice.entersState(player, voice.AudioPlayerStatus.Playing, 10000);
 }
-
-client.on('ready', async () => {
-  const channel = getFirstVoiceChannel();
-  joinVoice(channel);
-
-  client.on('message', async (msg) => {
-    const { content } = msg;
-
-    if (content.startsWith('!sim')) await sim.run(msg);
-    if (content.startsWith('!roll')) await roll.run(msg);
-  });
-
-  client.on('voiceStateUpdate', handleVoiceState);
-
-  console.log('ready');
-});
-
-const token = process.env.DISCOBOT_TOKEN;
-if (!token) throw new Error('Specify DISOBOT_TOKEN env var');
-
-client.login(token);
-
-function errored() {
-  console.warn('Unintentional exit');
-  console.warn(arguments);
-  process.exit(1);
-}
-
-client.on('error', errored);
-
-function exit() {
-  if (voiceConn) voiceConn.disconnect();
-  client.destroy();
-
-  process.exit(2);
-}
-
-process.on('SIGINT', () => exit());
-process.on('SIGTERM', () => exit());

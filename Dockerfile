@@ -28,4 +28,4 @@ COPY --from=build /opt/app/node_modules node_modules
 COPY --from=build /opt/app/dist dist
 COPY . .
 
-ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["node", "dist/app.js"]

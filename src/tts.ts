@@ -1,5 +1,4 @@
-import * as fs from 'fs';
-import * as fsProm from 'fs/promises';
+import * as fs from 'fs/promises';
 import * as cp from 'child_process';
 import * as crypto from 'crypto';
 import * as path from 'path';
@@ -24,8 +23,8 @@ export async function get(id: string, username: string): Promise<string> {
   await synth(username, tmpFile);
   const appended = await appendMyMan(tmpFile);
 
-  await fsProm.rename(appended, filePath);
-  await fsProm.unlink(tmpFile);
+  await fs.rename(appended, filePath);
+  await fs.unlink(tmpFile);
 
   return filePath;
 }
@@ -46,7 +45,7 @@ async function synth(username: string, filename: string): Promise<void> {
   const pollyOut = await pollyClient.send(cmd);
   const byteArr = await pollyOut.AudioStream.transformToByteArray();
 
-  await fsProm.writeFile(filename, byteArr);
+  await fs.writeFile(filename, byteArr);
 }
 
 async function appendMyMan(filePath: string): Promise<string> {
@@ -58,7 +57,7 @@ async function appendMyMan(filePath: string): Promise<string> {
 
 async function fileExists(filename: string): Promise<boolean> {
   try {
-    await fsProm.access(filename, fs.constants.R_OK);
+    await fs.access(filename, fs.constants.R_OK);
     return true;
   } catch {
     return false;
