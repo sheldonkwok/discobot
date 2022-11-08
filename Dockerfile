@@ -17,7 +17,7 @@ RUN npm run build && \
 # run stage
 FROM node:18
 
-RUN apt-get update && apt-get install -y libopus-dev ffmpeg espeak
+RUN apt-get update && apt-get install -y libopus-dev ffmpeg 
 
 USER node
 WORKDIR /opt/app
