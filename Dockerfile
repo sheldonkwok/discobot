@@ -9,7 +9,6 @@ RUN npm ci
 
 COPY src src 
 COPY tsconfig.json ./
-COPY config.sample.json ./config.json 
 
 
 RUN npm run build && \
@@ -26,7 +25,7 @@ WORKDIR /opt/app
 RUN mkdir /tmp/discoCache
 
 COPY --from=build /opt/app/node_modules node_modules
-COPY --from=build /opt/app/dist/src dist
+COPY --from=build /opt/app/dist dist
 COPY . .
 
 ENTRYPOINT ["node", "dist/index.js"]

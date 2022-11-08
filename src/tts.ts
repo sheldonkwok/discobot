@@ -3,13 +3,11 @@ import * as fsProm from 'fs/promises';
 import * as cp from 'child_process';
 import * as crypto from 'crypto';
 import * as path from 'path';
-import util from 'node:util';
-
-import config from '../config.json';
+import * as util from 'node:util';
 
 const execFile = util.promisify(cp.execFile);
 
-const AUDIO_DIR = config.mp3CacheDir;
+const AUDIO_DIR = '/tmp/discoCache';
 const MY_MAN_MP3 = path.resolve('./assets/myman.mp3');
 
 async function getFile(id: string, username: string): Promise<string> {
